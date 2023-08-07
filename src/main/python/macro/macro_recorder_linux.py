@@ -2,10 +2,9 @@
 import sys
 import os
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal, QProcess
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QApplication
-from fbs_runtime.application_context import is_frozen
+from PyQt6 import QtCore
+from PyQt6.QtCore import pyqtSignal, QProcess
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QApplication
 
 from keycodes.keycodes import Keycode
 from macro.macro_key import KeyUp, KeyDown

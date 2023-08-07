@@ -7,9 +7,9 @@ import time
 import threading
 import sys
 
-from PyQt5.QtCore import pyqtSignal, QCoreApplication
-from PyQt5.QtGui import QFontDatabase
-from PyQt5.QtWidgets import QHBoxLayout, QLineEdit, QToolButton, QPlainTextEdit, QProgressBar, QFileDialog, QDialog, \
+from PyQt6.QtCore import pyqtSignal, QCoreApplication
+from PyQt6.QtGui import QFontDatabase
+from PyQt6.QtWidgets import QHBoxLayout, QLineEdit, QToolButton, QPlainTextEdit, QProgressBar, QFileDialog, QDialog, \
     QCheckBox
 
 from editor.basic_editor import BasicEditor
@@ -129,7 +129,7 @@ class FirmwareFlasher(BasicEditor):
         self.addLayout(file_selector)
         self.txt_logger = QPlainTextEdit()
         self.txt_logger.setReadOnly(True)
-        self.txt_logger.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
+        self.txt_logger.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
         self.addWidget(self.txt_logger)
         progress_flash = QHBoxLayout()
         self.progress_bar = QProgressBar()

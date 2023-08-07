@@ -2,9 +2,9 @@
 import json
 from collections import defaultdict
 
-from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QVBoxLayout, QCheckBox, QGridLayout, QLabel, QWidget, QSizePolicy, QTabWidget, QSpinBox, \
+from PyQt6 import QtCore
+from PyQt6.QtCore import pyqtSignal, QObject
+from PyQt6.QtWidgets import QVBoxLayout, QCheckBox, QGridLayout, QLabel, QWidget, QSizePolicy, QTabWidget, QSpinBox, \
     QHBoxLayout, QPushButton, QMessageBox
 
 from editor.basic_editor import BasicEditor
@@ -160,12 +160,12 @@ class QmkSettings(BasicEditor):
                 continue
 
             w = QWidget()
-            w.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+            w.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum)
             container = QGridLayout()
             w.setLayout(container)
             l = QVBoxLayout()
             l.addWidget(w)
-            l.setAlignment(w, QtCore.Qt.AlignHCenter)
+            l.setAlignment(w, QtCore.Qt.AlignmentFlag.AlignHCenter)
             w2 = QWidget()
             w2.setLayout(l)
             self.misc_widgets += [w, w2]
@@ -233,9 +233,9 @@ class QmkSettings(BasicEditor):
                 and len(self.device.keyboard.supported_settings))
 
     @classmethod
-    def initialize(cls, appctx):
+    def initialize(cls):
         cls.qsid_fields = defaultdict(list)
-        with open(appctx.get_resource("qmk_settings.json"), "r") as inf:
+        with open("/Users/jurica.bacurin/Dev/vial-gui/src/main/resources/base/qmk_settings.json", "r") as inf:
             cls.settings_defs = json.load(inf)
         for tab in cls.settings_defs["tabs"]:
             for field in tab["fields"]:

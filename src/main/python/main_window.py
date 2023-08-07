@@ -2,10 +2,13 @@
 import logging
 import platform
 from json import JSONDecodeError
+from PyQt6 import QtWidgets
+from PyQt6 import QtCore
 
-from PyQt5.QtCore import Qt, QSettings, QStandardPaths, QTimer, QRect, QT_VERSION_STR
-from PyQt5.QtWidgets import QWidget, QComboBox, QToolButton, QHBoxLayout, QVBoxLayout, QMainWindow, QAction, qApp, \
-    QFileDialog, QDialog, QTabWidget, QActionGroup, QMessageBox, QLabel
+from PyQt6.QtCore import Qt, QSettings, QStandardPaths
+from PyQt6.QtWidgets import QWidget, QComboBox, QToolButton, QHBoxLayout, QVBoxLayout, QMainWindow, QApplication, \
+    QFileDialog, QDialog, QTabWidget, QMessageBox, QLabel
+from PyQt6.QtGui import QAction, QActionGroup
 
 import os
 import sys
@@ -36,9 +39,9 @@ import themes
 
 class MainWindow(QMainWindow):
 
-    def __init__(self, appctx):
+    def __init__(self):
         super().__init__()
-        self.appctx = appctx
+        # self.appctx = appctx
 
         self.ui_lock_count = 0
 
@@ -50,8 +53,9 @@ class MainWindow(QMainWindow):
 
         _pos = self.settings.value("pos", None)
         # NOTE: QDesktopWidget is obsolete, but QApplication.screenAt only usable in Qt 5.10+
-        if _pos and qApp.desktop().geometry().contains(QRect(_pos, self.size())):
-        #if _pos and qApp.screenAt(_pos) and qApp.screenAt(_pos + (self.rect().bottomRight())):
+        qApp = QtWidgets.QApplication.instance()
+        # if _pos and qApp.desktop().geometry().contains(QRect(_pos, self.size())):
+        if _pos and qApp.screenAt(_pos) and qApp.screenAt(_pos + (self.rect().bottomRight())):
             self.move(self.settings.value("pos"))
 
         themes.Theme.set_theme(self.get_theme())
@@ -60,7 +64,7 @@ class MainWindow(QMainWindow):
         self.combobox_devices.currentIndexChanged.connect(self.on_device_selected)
 
         self.btn_refresh_devices = QToolButton()
-        self.btn_refresh_devices.setToolButtonStyle(Qt.ToolButtonTextOnly)
+        self.btn_refresh_devices.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextOnly)
         self.btn_refresh_devices.setText(tr("MainWindow", "Refresh"))
         self.btn_refresh_devices.clicked.connect(self.on_click_refresh)
 
@@ -76,7 +80,7 @@ class MainWindow(QMainWindow):
         self.tap_dance = TapDance()
         self.combos = Combos()
         self.key_override = KeyOverride()
-        QmkSettings.initialize(appctx)
+        QmkSettings.initialize()
         self.qmk_settings = QmkSettings()
         self.matrix_tester = MatrixTest(self.layout_editor)
         self.rgb_configurator = RGBConfigurator()
@@ -101,14 +105,14 @@ class MainWindow(QMainWindow):
                           'Follow the instructions linked below:<br>' \
                           '<a href="https://get.vial.today/manual/linux-udev.html">https://get.vial.today/manual/linux-udev.html</a>'
         self.lbl_no_devices = QLabel(tr("MainWindow", no_devices))
-        self.lbl_no_devices.setTextFormat(Qt.RichText)
-        self.lbl_no_devices.setAlignment(Qt.AlignCenter)
+        self.lbl_no_devices.setTextFormat(Qt.TextFormat.RichText)
+        self.lbl_no_devices.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         layout = QVBoxLayout()
         layout.addLayout(layout_combobox)
         layout.addWidget(self.tabs, 1)
         layout.addWidget(self.lbl_no_devices)
-        layout.setAlignment(self.lbl_no_devices, Qt.AlignHCenter)
+        layout.setAlignment(self.lbl_no_devices, Qt.AlignmentFlag.AlignHCenter)
         self.tray_keycodes = TabbedKeycodes()
         self.tray_keycodes.make_tray()
         layout.addWidget(self.tray_keycodes, 1)
@@ -123,7 +127,7 @@ class MainWindow(QMainWindow):
         self.autorefresh.devices_updated.connect(self.on_devices_updated)
 
         # cache for via definition files
-        self.cache_path = QStandardPaths.writableLocation(QStandardPaths.CacheLocation)
+        self.cache_path = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.CacheLocation)
         if not os.path.exists(self.cache_path):
             os.makedirs(self.cache_path)
 
@@ -164,7 +168,7 @@ class MainWindow(QMainWindow):
 
         exit_act = QAction(tr("MenuFile", "Exit"), self)
         exit_act.setShortcut("Ctrl+Q")
-        exit_act.triggered.connect(self.close)
+        exit_act.triggered.connect(self.on_quit)
 
         if sys.platform != "emscripten":
             file_menu = self.menuBar().addMenu(tr("Menu", "File"))
@@ -342,6 +346,9 @@ class MainWindow(QMainWindow):
                 data = inf.read()
             self.autorefresh.sideload_via_json(data)
 
+    def on_quit(self):
+        QtWidgets.QApplication.instance().quit()
+
     def on_load_dummy(self):
         dialog = QFileDialog()
         dialog.setDefaultSuffix("json")
@@ -393,7 +400,7 @@ class MainWindow(QMainWindow):
         self.settings.setValue("theme", theme)
         msg = QMessageBox()
         msg.setText(tr("MainWindow", "In order to fully apply the theme you should restart the application."))
-        msg.exec_()
+        msg.exec()
 
     def on_tab_changed(self, index):
         TabbedKeycodes.close_tray()
@@ -414,8 +421,8 @@ class MainWindow(QMainWindow):
         text = 'Vial {}<br><br>Python {}<br>Qt {}<br><br>' \
                'Licensed under the terms of the<br>GNU General Public License (version 2 or later)<br><br>' \
                '<a href="https://get.vial.today/">https://get.vial.today/</a>' \
-               .format(qApp.applicationVersion(),
-                       platform.python_version(), QT_VERSION_STR)
+               .format(QtWidgets.QApplication.instance().applicationVersion(),
+                       platform.python_version(), QtCore.QT_VERSION_STR)
 
         if sys.platform == "emscripten":
             self.msg_about = QMessageBox()
