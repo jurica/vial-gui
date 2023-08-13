@@ -241,9 +241,9 @@ class MainWindow(QMainWindow):
     def on_layout_load(self):
         dialog = QFileDialog()
         dialog.setDefaultSuffix("vil")
-        dialog.setAcceptMode(QFileDialog.AcceptOpen)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
         dialog.setNameFilters(["Vial layout (*.vil)"])
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             with open(dialog.selectedFiles()[0], "rb") as inf:
                 data = inf.read()
             self.keymap_editor.restore_layout(data)
@@ -252,9 +252,9 @@ class MainWindow(QMainWindow):
     def on_layout_save(self):
         dialog = QFileDialog()
         dialog.setDefaultSuffix("vil")
-        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
         dialog.setNameFilters(["Vial layout (*.vil)"])
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.DialogCode.Accepted:
             with open(dialog.selectedFiles()[0], "wb") as outf:
                 outf.write(self.keymap_editor.save_layout())
 
